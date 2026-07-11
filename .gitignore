@@ -1,0 +1,12 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+
+# --- Environnement local (jamais de secrets versionnés) ---
+.env
+.env.local
