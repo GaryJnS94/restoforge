@@ -42,6 +42,16 @@ Exemples :
 
 Scopes : `api`, `web`, `mobile`, `forge-ui`, `docs`, `infra`.
 
+### Merge requests
+
+Titre : ID Linear en préfixe, puis format commit :
+`[RES-XX] type(scope): description`
+
+Exemple : `[RES-2] docs: bootstrap Docusaurus + 3 premiers ADR`
+
+Description : sections **Quoi** / **Pourquoi**, terminée par `Closes RES-XX`.
+Assignee renseigné, suppression de la branche source au merge.
+
 ### Workflow
 
 Le suivi est dans Linear (équipe RES). Les statuts bougent automatiquement :
