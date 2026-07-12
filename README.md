@@ -6,7 +6,7 @@ et un design system commun (forge-ui, Web Components Lit).
 
 > 🔗 Dépôt principal : GitLab (CI/CD) — miroir en lecture sur GitHub.
 
-## La suite
+## La suite //test de commit
 
 | App         | Techno           | Rôle                     | Statut        |
 | ----------- | ---------------- | ------------------------ | ------------- |
