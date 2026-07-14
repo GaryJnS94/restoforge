@@ -6,7 +6,7 @@ et un design system commun (forge-ui, Web Components Lit).
 
 > 🔗 Dépôt principal : GitLab (CI/CD) — miroir en lecture sur GitHub.
 
-## La suite //test de commit
+## La suite
 
 | App         | Techno           | Rôle                     | Statut        |
 | ----------- | ---------------- | ------------------------ | ------------- |
@@ -21,6 +21,47 @@ et un design system commun (forge-ui, Web Components Lit).
 - `mobile/` — SupplyForge (React Native)
 - `forge-ui/` — Design system (Lit)
 - `docs/` — Documentation (Docusaurus) + ADR
+
+## Démarrage rapide
+
+### Prérequis
+
+- [Docker](https://docs.docker.com/get-docker/) avec Docker Compose v2
+
+### Lancer l'environnement de dev
+
+Copier le fichier d'exemple et définir un mot de passe :
+
+```bash
+cp .env.example .env
+# éditer .env : remplacer la valeur de POSTGRES_PASSWORD
+```
+
+Démarrer PostgreSQL :
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+Arrêter l'environnement (les données sont conservées dans un volume Docker) :
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+### Vérifier
+
+```bash
+docker compose -f docker-compose.dev.yml ps
+```
+
+Le service `postgres` doit afficher le statut `Up ... (healthy)`.
+
+Pour se connecter à la base :
+
+```bash
+docker exec -it restoforge-postgres psql -U restoforge -d restoforge
+```
 
 ## Conventions
 

@@ -10,3 +10,5 @@ Thumbs.db
 # --- Environnement local (jamais de secrets versionnés) ---
 .env
 .env.local
+
+.claude
