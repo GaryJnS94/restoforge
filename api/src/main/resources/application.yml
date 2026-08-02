@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: api
+
+  datasource:
+    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB:restoforge}"
+    username: ${POSTGRES_USER:restoforge}
+    password: ${POSTGRES_PASSWORD:changeme}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+management:
+  endpoint:
+    health:
+      show-details: always

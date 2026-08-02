@@ -27,6 +27,14 @@ const config: Config = {
     locales: ["fr"],
   },
 
+  // Diagrammes Mermaid dans les pages Markdown : les deux réglages vont de
+  // pair. `markdown.mermaid` fait interpréter les blocs ```mermaid comme des
+  // diagrammes plutôt que comme du code, le thème fournit le rendu.
+  markdown: {
+    mermaid: true,
+  },
+  themes: ["@docusaurus/theme-mermaid"],
+
   presets: [
     [
       "classic",

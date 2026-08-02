@@ -2,10 +2,19 @@
 .DS_Store
 Thumbs.db
 
+# Artefacts WSL / Windows
+*:Zone.Identifier
+
 # --- IDE ---
 .idea/
 .vscode/
 *.iml
+
+# Dépendances
+node_modules/
+
+# Artefacts WSL / Windows
+*:Zone.Identifier
 
 # --- Environnement local (jamais de secrets versionnés) ---
 .env

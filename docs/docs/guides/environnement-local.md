@@ -7,7 +7,7 @@ title: Environnement de dev local
 
 L'environnement de développement repose entièrement sur Docker : chaque brique
 (base de données, et bientôt l'API) tourne dans un conteneur, orchestré par
-`docker-compose.dev.yml` à la racine du dépôt. Objectif : tout lancer d'une
+`compose.yaml` à la racine du dépôt. Objectif : tout lancer d'une
 seule commande, sur n'importe quelle machine, sans rien installer d'autre que Docker.
 
 À ce stade, l'environnement contient un seul service : **PostgreSQL 16**.
@@ -19,8 +19,8 @@ L'API Spring Boot le rejoindra (voir RES-8).
 cp .env.example .env
 # éditer .env : définir un vrai POSTGRES_PASSWORD
 
-docker compose -f docker-compose.dev.yml up -d
-docker compose -f docker-compose.dev.yml ps   # attendre le statut (healthy)
+docker compose up -d
+docker compose ps   # attendre le statut (healthy)
 ```
 
 ## Les fichiers d'environnement
@@ -47,12 +47,12 @@ Les données vivent dans le volume nommé `restoforge_db_data`, géré par Docke
 Conséquence : le conteneur est jetable, les données ne le sont pas.
 
 ```bash
-docker compose -f docker-compose.dev.yml down   # détruit le conteneur, GARDE les données
-docker volume ls                                # restoforge_db_data est toujours là
+docker compose down   # détruit le conteneur, GARDE les données
+docker volume ls      # restoforge_db_data est toujours là
 ```
 
 :::danger down -v : destructeur
-`docker compose -f docker-compose.dev.yml down -v` supprime **aussi le volume,
+`docker compose down -v` supprime **aussi le volume,
 donc toutes les données**. À réserver aux réinitialisations volontaires
 (changement d'identifiants, base corrompue, repartir de zéro).
 :::
@@ -82,7 +82,7 @@ démarrera qu'une fois la base réellement prête, pas juste le conteneur lancé
 En cas de doute sur le fichier compose ou les variables :
 
 ```bash
-docker compose -f docker-compose.dev.yml config
+docker compose config
 ```
 
 Cette commande valide et affiche la configuration résolue (variables

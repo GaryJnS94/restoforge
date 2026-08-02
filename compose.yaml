@@ -1,0 +1,63 @@
+# Environnement de dev local — RES-3
+# Lancement :  docker compose up -d
+# Arrêt :      docker compose down
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: restoforge-postgres
+
+    # Variables lues depuis le fichier .env (même dossier, chargé automatiquement)
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB} # crée la base "restoforge" au 1er démarrage
+
+    # Perce le réseau isolé du conteneur : hôte:conteneur
+    # → depuis ton poste : localhost:5432
+    ports:
+      - "5432:5432"
+
+    # Les données Postgres vivent dans le volume, pas dans le conteneur
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    # Bonus : permet à Docker de savoir quand la base est VRAIMENT prête
+    # (utile dès RES-8 : l'API attendra service_healthy avant de démarrer)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    # Construit l'image depuis api/Dockerfile (contexte de build = api/)
+    build: ./api
+    container_name: restoforge-api
+
+    environment:
+      # Compose crée un réseau privé doté d'un DNS interne : chaque service y
+      # est joignable par son nom. Depuis un conteneur, "localhost" désigne le
+      # conteneur lui-même — l'API ne trouverait aucune base à cette adresse.
+      # C'est la raison d'être du ${DB_HOST:localhost} d'application.yml :
+      # valeur par défaut hors conteneur, "postgres" injecté ici.
+      - DB_HOST=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+    # → depuis ton poste : localhost:8080
+    ports:
+      - "8080:8080"
+
+    # condition: service_healthy, et non le simple depends_on : celui-ci
+    # n'attend que le démarrage du conteneur. L'API, prête en quelques
+    # secondes, taperait sur une base encore en cours d'initialisation et
+    # s'arrêterait. C'est ici que le healthcheck pg_isready ci-dessus sert.
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# Déclaration du volume nommé (géré par Docker, survit aux `down`)
+volumes:
+  db_data:

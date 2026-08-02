@@ -1,0 +1,10 @@
+# Exclut du contexte de build tout ce que Docker n'a pas à recevoir.
+# Le contexte est transféré au démon à chaque build : plus il est léger,
+# plus le build démarre vite.
+target/
+.git/
+.idea/
+*.iml
+.vscode/
+README.md
+HELP.md

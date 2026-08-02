@@ -1,7 +1,7 @@
 # RestoForge
 
 SaaS B2B de gestion d'approvisionnement pour la restauration.
-Suite d'applications partageant un backend unique (Spring Boot 3 + PostgreSQL)
+Suite d'applications partageant un backend unique (Spring Boot 4 + PostgreSQL)
 et un design system commun (forge-ui, Web Components Lit).
 
 > 🔗 Dépôt principal : GitLab (CI/CD) — miroir en lecture sur GitHub.
@@ -16,7 +16,7 @@ et un design system commun (forge-ui, Web Components Lit).
 
 ## Structure du monorepo
 
-- `api/` — Backend Spring Boot 3 + PostgreSQL
+- `api/` — Backend Spring Boot 4 + PostgreSQL
 - `web/` — StockForge (Angular 22)
 - `mobile/` — SupplyForge (React Native)
 - `forge-ui/` — Design system (Lit)
@@ -40,19 +40,19 @@ cp .env.example .env
 Démarrer PostgreSQL :
 
 ```bash
-docker compose -f docker-compose.dev.yml up -d
+docker compose up -d
 ```
 
 Arrêter l'environnement (les données sont conservées dans un volume Docker) :
 
 ```bash
-docker compose -f docker-compose.dev.yml down
+docker compose down
 ```
 
 ### Vérifier
 
 ```bash
-docker compose -f docker-compose.dev.yml ps
+docker compose ps
 ```
 
 Le service `postgres` doit afficher le statut `Up ... (healthy)`.
