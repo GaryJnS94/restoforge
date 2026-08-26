@@ -100,6 +100,9 @@ Le nommage des tables est le garde-fou : `supplier_order`,
 - Chaque module bootstrapé reçoit un README : comment lancer, comment tester.
 - Une page Docusaurus de description s'écrit quand une tranche verticale est
   livrée et stabilisée, pas pendant qu'elle bouge.
+- Le vocabulaire métier, technique et workflow du projet est consigné dans le
+  lexique : `docs/docs/reference/lexique.md`. Tout terme ou sigle ambigu s'y
+  définit.
 
 ## Commandes
 
