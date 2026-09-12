@@ -15,6 +15,20 @@ docs/        Docusaurus — documentation et ADR
 compose.yaml Orchestration Docker locale (auto-détecté, pas de -f)
 ```
 
+### Découpage du code backend
+
+Le code backend est organisé **par domaine métier**, jamais par couche
+technique. Dans `com.restoforge.api`, les packages `stock` et `commandes`
+correspondent aux deux modules du périmètre MVP ; chacun contient ses entités,
+son repository, son service, son controller et ses DTO (sous-package `dto`).
+Pas de packages `entity/`, `repository/`, `service/` ni `controller/`.
+
+L'entité ne porte aucun suffixe (`Product`, `Supplier`, `SupplierOrder`) ; les
+classes techniques le portent (`ProductRepository`, `ProductService`). Les
+packages sont en français, les classes en anglais.
+
+Voir [ADR-006](docs/docs/adr/adr-006-decoupage-par-domaine.md).
+
 ## Stack (verrouillée)
 
 | Brique | Techno |

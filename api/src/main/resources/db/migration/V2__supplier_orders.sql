@@ -28,8 +28,8 @@ CREATE TABLE supplier_order_line (
         REFERENCES supplier_order (id) ON DELETE CASCADE,
     CONSTRAINT fk_order_line_product FOREIGN KEY (product_id)
         REFERENCES product (id) ON DELETE RESTRICT,
-    -- Un produit ne figure qu'une fois par commande : la quantité s'ajuste sur
-    -- la ligne existante.
+    -- Un produit ne figure qu'une fois par commande : ajouter un produit déjà
+    -- présent est refusé (409), jamais fusionné avec la ligne existante.
     CONSTRAINT uq_order_line_product UNIQUE (supplier_order_id, product_id),
     -- Toute ligne porte une quantité saisie, strictement positive.
     CONSTRAINT ck_order_line_quantity   CHECK (quantity > 0),
