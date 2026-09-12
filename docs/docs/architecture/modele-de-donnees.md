@@ -17,11 +17,50 @@ tables. Le schéma est créé exclusivement par les
 
 ```mermaid
 erDiagram
+    supplier {
+        bigint id PK
+        varchar_150 name
+        varchar_255 email "facultatif"
+        varchar_30 phone "facultatif"
+        text address "facultatif"
+    }
+
+    product {
+        bigint id PK
+        varchar_150 name
+        varchar_20 unit
+        numeric_10_2 unit_price
+        bigint supplier_id FK
+        numeric_10_3 alert_threshold
+        numeric_10_3 stock
+    }
+
+    supplier_order {
+        bigint id PK
+        bigint supplier_id FK
+        varchar_20 status
+        timestamptz created_at
+        timestamptz sent_at "facultatif"
+        timestamptz received_at "facultatif"
+    }
+
+    supplier_order_line {
+        bigint id PK
+        bigint supplier_order_id FK
+        bigint product_id FK
+        numeric_10_3 quantity
+        numeric_10_2 unit_price
+    }
+
     supplier ||--o{ product : "fournit"
     supplier ||--o{ supplier_order : "reçoit"
     supplier_order ||--o{ supplier_order_line : "contient"
     product ||--o{ supplier_order_line : "figure dans"
 ```
+
+Les types sont notés sans parenthèses, que le rendu du diagramme n'accepte pas :
+les types SQL exacts figurent dans les tableaux détaillés plus bas, avec les
+contraintes `CHECK` et les valeurs par défaut, que le diagramme ne reprend pas.
 
 Les quatre relations se lisent ainsi :
 
