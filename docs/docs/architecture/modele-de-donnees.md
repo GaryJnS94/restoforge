@@ -102,8 +102,10 @@ fois dans `supplier_order`. Les trois lignes sont trois enregistrements de
 distincts du catalogue.
 
 La contrainte `uq_order_line_product` interdit qu'un produit figure deux fois
-dans la même commande : commander davantage de farine ajuste la quantité de la
-ligne existante plutôt que d'ajouter une seconde ligne farine.
+dans la même commande. Ajouter à un brouillon un produit qui y est déjà est
+refusé, jamais fusionné : l'API répond 409, et la quantité de la ligne existante
+reste inchangée. Côté interface, le cas ne se présente pas — un produit déjà
+commandé disparaît de la liste de sélection.
 
 ## Les tables, une par une
 
