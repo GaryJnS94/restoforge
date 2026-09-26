@@ -121,15 +121,21 @@ Le nommage des tables est le garde-fou : `supplier_order`,
 ## Commandes
 
 ```bash
-docker compose up -d          # environnement local (compose.yaml auto-détecté)
+docker compose up -d          # environnement local complet (postgres + api)
+docker compose up -d --build  # idem, en reconstruisant l'image de l'API
 docker compose ps             # vérifier l'état, attendre 'healthy'
 docker compose config         # valider le fichier sans rien lancer
 
-cd api && ./mvnw spring-boot:run   # lancer l'API
-cd api && ./mvnw test              # tests backend
+# API sur l'hôte, depuis api/ : Maven ne lit pas .env
+docker compose stop api       # libère le port 8080
+(set -a && source ../.env && set +a && ./mvnw spring-boot:run)
 
-cd docs && npm start               # documentation en local
+cd api && ./mvnw test         # tests backend — exige un démon Docker démarré (Testcontainers)
+
+cd docs && npm start          # documentation en local
 ```
+
+Procédures détaillées et diagnostic : `docs/docs/guides/environnement-local.md`.
 
 ## Principes
 
