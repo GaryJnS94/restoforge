@@ -29,6 +29,23 @@ packages sont en français, les classes en anglais.
 
 Voir [ADR-006](docs/docs/adr/adr-006-decoupage-par-domaine.md).
 
+### Conventions service (établies en RES-25)
+
+- Le service renvoie des **entités** ; la conversion en DTO se fait dans le
+  controller (`ProductResponse.from(...)`). D'autres services l'appellent : il
+  n'expose pas le contrat HTTP.
+- Méthodes `public` : un service est appelé depuis d'autres packages
+  (`commandes` → `stock`).
+- `@Transactional(readOnly = true)` sur la classe ; chaque méthode d'écriture
+  surcharge avec `@Transactional`.
+- `getX` renvoie l'objet ou lève une exception métier
+  (`XNotFoundException extends RuntimeException`) ; `findX` renvoie un
+  `Optional`.
+- Les exceptions métier ne portent **aucun code HTTP** ni import Spring Web :
+  le web les traduit.
+- Tests de service : unitaires, JUnit + Mockito
+  (`@ExtendWith(MockitoExtension.class)`), sans contexte Spring ni Docker.
+
 ## Stack (verrouillée)
 
 | Brique | Techno |
