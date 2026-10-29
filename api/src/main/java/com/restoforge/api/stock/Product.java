@@ -121,4 +121,12 @@ public class Product {
   public BigDecimal getStock() {
     return stock;
   }
+
+  /**
+   * Indicateur « sous le seuil », calculé à la volée : jamais persisté.
+   * Strictement inférieur au seuil — un stock égal au seuil n'alerte pas.
+   */
+  public boolean isBelowThreshold() {
+    return stock.compareTo(alertThreshold) < 0;
+  }
 }
