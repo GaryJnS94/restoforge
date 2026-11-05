@@ -1,163 +1,64 @@
-# RestoForge — contexte projet
+# RestoForge — consignes pour Claude Code
 
-SaaS B2B de gestion d'approvisionnement pour la restauration.
-Suite d'applications front partageant un backend unique, un contrat OpenAPI
-et un design system commun.
+SaaS B2B de gestion d'approvisionnement pour la restauration : un backend
+Spring Boot unique (`api/`), des applications web et mobile, une documentation
+Docusaurus (`docs/`). Ce fichier ne recopie rien : il indique où lire.
 
-## Structure du monorepo
+## Où trouver l'information
 
-```
-api/         API Spring Boot — backend unique, sert tous les fronts
-web/         StockForge — Angular (PWA), catalogue & stock
-mobile/      SupplyForge — React Native, commandes fournisseurs
-forge-ui/    Design system Lit (Web Components + design tokens)
-docs/        Docusaurus — documentation et ADR
-compose.yaml Orchestration Docker locale (auto-détecté, pas de -f)
-```
+| Besoin | Source |
+| --- | --- |
+| Commandes (tests, API, base, doc) | `README.md` |
+| Conventions du backend, par couche | `docs/docs/architecture/backend.md` |
+| Schéma de la base | `docs/docs/architecture/modele-de-donnees.md` |
+| Règles métier numérotées | `docs/docs/reference/regles-metier.md` |
+| Vocabulaire métier et technique | `docs/docs/reference/lexique.md` |
+| Branches, commits, merge requests | `docs/docs/guides/workflow.md` |
 
-### Découpage du code backend
+Lire la page concernée avant de proposer une modification.
 
-Le code backend est organisé **par domaine métier**, jamais par couche
-technique. Dans `com.restoforge.api`, les packages `stock` et `commandes`
-correspondent aux deux modules du périmètre MVP ; chacun contient ses entités,
-son repository, son service, son controller et ses DTO (sous-package `dto`).
-Pas de packages `entity/`, `repository/`, `service/` ni `controller/`.
+## Ton rôle sur ce dépôt
 
-L'entité ne porte aucun suffixe (`Product`, `Supplier`, `SupplierOrder`) ; les
-classes techniques le portent (`ProductRepository`, `ProductService`). Les
-packages sont en français, les classes en anglais.
+Le développeur écrit le code lui-même. Ton rôle est de l'aider à comprendre.
 
-Voir [ADR-006](docs/docs/adr/adr-006-decoupage-par-domaine.md).
+**Tu peux :**
 
-### Conventions service (établies en RES-25)
+- expliquer une erreur, une trace ou un test rouge, et la correction à apporter ;
+- lancer les vérifications (`./mvnw compile`, `./mvnw test`, `npm run build`
+  dans `docs/`) et en lire le résultat ;
+- chercher dans le code : où une classe est définie, qui appelle une méthode.
 
-- Le service renvoie des **entités** ; la conversion en DTO se fait dans le
-  controller (`ProductResponse.from(...)`). D'autres services l'appellent : il
-  n'expose pas le contrat HTTP.
-- Méthodes `public` : un service est appelé depuis d'autres packages
-  (`commandes` → `stock`).
-- `@Transactional(readOnly = true)` sur la classe ; chaque méthode d'écriture
-  surcharge avec `@Transactional`.
-- `getX` renvoie l'objet ou lève une exception métier
-  (`XNotFoundException extends RuntimeException`) ; `findX` renvoie un
-  `Optional`.
-- Les exceptions métier ne portent **aucun code HTTP** ni import Spring Web :
-  le web les traduit.
-- Tests de service : unitaires, JUnit + Mockito
-  (`@ExtendWith(MockitoExtension.class)`), sans contexte Spring ni Docker.
+**Tu ne fais pas :**
 
-## Stack (verrouillée)
+- créer ou modifier un fichier de code (`api/src`, `web/`, `mobile/`,
+  `forge-ui/`). Tu décris la correction ; le développeur l'écrit. S'il te demande
+  explicitement d'écrire le code, rappelle-lui cette règle une fois, puis suis
+  sa décision ;
+- créer une classe, un package ou une méthode « pour plus tard » : tout ajout a
+  un appelant dans le ticket en cours ;
+- commiter ou pousser.
 
-| Brique | Techno |
-|---|---|
-| Backend | Spring Boot 4.1 · Java 21 (LTS) · Spring Web, Data JPA, Validation |
-| Base de données | PostgreSQL · migrations Flyway |
-| Contrat front/back | OpenAPI (springdoc) → types TypeScript générés |
-| Front web | Angular 22 · TypeScript strict · signal-first, zoneless, OnPush |
-| Mobile | React Native |
-| Design system | Lit (Web Components) |
-| Infra | Docker + docker compose · GitLab CI/CD |
-| Documentation | Docusaurus (v3) |
+## Périmètre
 
-Kubernetes est explicitement hors périmètre MVP.
+Le MVP couvre une seule boucle : catalogue et stock, puis commandes
+fournisseurs. MenuForge, les recettes, la couche IA, la réception partielle,
+le multi-restaurant et les paiements sont hors périmètre : une idée qui en
+relève devient une issue Linear avec le label `hors-mvp`, jamais du code.
 
-## Périmètre MVP
+« Commande » a deux sens : commande **client** (`customer_order`, hors MVP) et
+commande **fournisseur** (`supplier_order`). Ne jamais les confondre ; `order`
+seul est proscrit (mot réservé SQL).
 
-Une seule boucle métier, complète et déployée :
+## Pièges qui font perdre du temps
 
-**Catalogue & Stock → Commandes fournisseurs**
-
-1. CRUD fournisseurs, CRUD produits (nom, unité, prix, fournisseur, seuil
-   d'alerte), niveau de stock et indicateur « sous le seuil ».
-2. Créer une commande fournisseur, suivre ses statuts.
-
-Livraison : la boucle complète arrive d'abord sur StockForge (web), puis
-SupplyForge (mobile) comme app terrain.
-
-### Hors périmètre — ne pas implémenter
-
-- MenuForge (prise de commande client : pad serveur, borne, en ligne)
-- Notion de recettes (plat → ingrédients)
-- Couche IA (extraction de factures, suggestions)
-- Multi-restaurant, rôles fins, analytics, paiements
-- Réception partielle et écarts de livraison
-
-Toute idée hors périmètre se capture comme issue Linear avec le label
-`hors-mvp`, elle ne se code pas.
-
-## Distinction capitale — deux sens du mot « commande »
-
-- **Commande client** = plats du menu (MenuForge, hors-MVP) → `customer_order`
-- **Commande fournisseur** = approvisionnement (SupplyForge) → `supplier_order`
-
-Ne jamais les confondre dans le modèle de données ni dans les écrans.
-Le nommage des tables est le garde-fou : `supplier_order`,
-`supplier_order_line`. `order` seul est proscrit — mot réservé SQL.
-
-## Règles métier validées
-
-1. Une commande = un seul fournisseur. `supplier_id` porté par la commande,
-   NOT NULL, jamais déduit des lignes.
-2. Quantité suggérée = ramener le stock à 2 × le seuil.
-   `max(0, 2 × threshold − currentStock)`, calculée à la volée, jamais stockée.
-3. Cycle de statuts figé : `DRAFT` → `SENT` → `RECEIVED`. Pas de `CANCELLED`.
-   Transition non séquentielle → 409.
-4. Seul `DRAFT` est éditable. Modifier une commande `SENT` ou `RECEIVED` → 409.
-5. Le fournisseur est choisi en premier ; la sélection produits en découle.
-6. Une suggestion n'est jamais une commande — le système propose, l'utilisateur
-   décide. L'ajout manuel d'un produit non sous le seuil est autorisé, sans
-   quantité par défaut (saisie obligatoire, `quantity > 0`).
-7. Les quantités d'un brouillon sont figées à l'ajout, jamais recalculées.
-8. Le passage en `RECEIVED` incrémente le stock, dans la même transaction que
-   le changement de statut. Le stock ne bouge jamais au passage en `SENT`.
-9. Reçu = commandé. Pas de `received_quantity`, pas d'historique de mouvements
-   de stock dans le MVP.
-
-## Conventions de travail
-
-- **Suivi** : Linear, équipe `RES`. Statuts pilotés par le webhook GitLab —
-  ne jamais les déplacer à la main.
-- **Branches** : nom fourni par l'issue Linear (`garyjohnson1994/res-XX-...`).
-- **Commits** : Conventional Commits préfixés de l'ID.
-  `[RES-XX] type(scope): description`
-- **MR** : titre au même format, ouverte en draft dès le premier push.
-  Fast-forward + squash. `main` est protégée, aucun push direct.
-- **Remote** : GitLab est le dépôt primaire, GitHub un miroir.
-
-## Règles de documentation
-
-- Une décision structurante (outil, pattern, architecture) s'accompagne d'un
-  **ADR écrit dans la même MR** que le code. Une décision sans ADR ne se merge pas.
-- Chaque module bootstrapé reçoit un README : comment lancer, comment tester.
-- Une page Docusaurus de description s'écrit quand une tranche verticale est
-  livrée et stabilisée, pas pendant qu'elle bouge.
-- Le vocabulaire métier, technique et workflow du projet est consigné dans le
-  lexique : `docs/docs/reference/lexique.md`. Tout terme ou sigle ambigu s'y
-  définit.
-
-## Commandes
-
-```bash
-docker compose up -d          # environnement local complet (postgres + api)
-docker compose up -d --build  # idem, en reconstruisant l'image de l'API
-docker compose ps             # vérifier l'état, attendre 'healthy'
-docker compose config         # valider le fichier sans rien lancer
-
-# API sur l'hôte, depuis api/ : Maven ne lit pas .env
-docker compose stop api       # libère le port 8080
-(set -a && source ../.env && set +a && ./mvnw spring-boot:run)
-
-cd api && ./mvnw test         # tests backend — exige un démon Docker démarré (Testcontainers)
-
-cd docs && npm start          # documentation en local
-```
-
-Procédures détaillées et diagnostic : `docs/docs/guides/environnement-local.md`.
-
-## Principes
-
-- Toujours commencer par une tranche verticale fine de bout en bout avant
-  d'élargir horizontalement.
-- Infrastructure et documentation avant les fonctionnalités.
-- Code clair et maintenable plutôt que techniquement impressionnant.
-- Livrer une boucle finie et déployée vaut mieux que six modules à moitié faits.
+- Toujours `./mvnw`, jamais `mvn`, et depuis `api/` (là où est le `pom.xml`).
+- Les tests de repository utilisent Testcontainers : un échec en quelques
+  secondes signifie en général que le démon Docker est injoignable.
+- Maven ne lit pas `.env` : l'API se lance avec le sous-shell décrit dans le
+  README.
+- Face à `Failed to load ApplicationContext`, la cause est dans le **dernier**
+  `Caused by` (`grep -n "Caused by" target/surefire-reports/*.txt | tail -3`).
+- Dans `docs/` : `npm ci`, jamais `npm install` (il réécrit
+  `package-lock.json`). Jamais npm à la racine du dépôt.
+- Les pages Docusaurus sont du MDX : pas d'accolades ni de `<` hors du code, et
+  les admonitions s'écrivent `:::caution[Titre]`.
