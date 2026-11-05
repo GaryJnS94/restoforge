@@ -106,6 +106,10 @@ Document consignant une décision structurante au format MADR — Contexte,
 Décision, Conséquences. Un ADR accepté est immuable : il n'est pas modifié mais
 remplacé par un nouvel ADR.
 
+Le registre des ADR est clos depuis le 05/11/2026 : les décisions sont
+désormais décrites, avec leur raison d'être, dans la documentation
+d'architecture. Les ADR existants restent consultables en archive.
+
 Voir : [ADR-001 — Monorepo](../adr/adr-001-monorepo.md)
 
 ### CRUD (Create, Read, Update, Delete)
@@ -175,6 +179,22 @@ Voir : [ADR-001 — Monorepo](../adr/adr-001-monorepo.md)
 
 Technique de correspondance entre des objets d'un langage et des tables
 relationnelles. Hibernate en est l'implémentation utilisée par le backend.
+
+### OSIV (Open Session In View)
+
+Réglage Spring (`spring.jpa.open-in-view`) qui garde la session Hibernate
+ouverte jusqu'à la fin de la requête HTTP. Il est désactivé dans RestoForge :
+une relation lue par la couche web doit avoir été chargée par le service.
+
+Voir : [Architecture du backend](../architecture/backend.md#open-session-in-view-désactivé)
+
+### ProblemDetail
+
+Format standard des réponses d'erreur d'une API HTTP (RFC 9457), de type de
+contenu `application/problem+json`. Toutes les erreurs de l'API RestoForge
+l'emploient.
+
+Voir : [Architecture du backend](../architecture/backend.md#erreurs-au-format-problemdetail)
 
 ### PWA (Progressive Web App)
 
