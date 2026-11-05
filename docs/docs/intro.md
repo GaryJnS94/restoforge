@@ -6,14 +6,15 @@ sidebar_position: 1
 
 Bienvenue dans la documentation de **RestoForge**. Ce site centralise la
 documentation vivante du projet : elle vit dans le monorepo, évolue avec le
-code et passe par les mêmes merge requests.
+code et passe par les mêmes merge requests. Une page se met à jour dans la MR
+qui change ce qu'elle décrit.
 
-La première brique est constituée des **ADR** (Architecture Decision Records) :
-chaque décision structurante du projet y est consignée avec son contexte, le
-choix retenu et ses conséquences. Un ADR documente le passé — il n'invente
-rien — et doit se lire en deux minutes.
+| Rubrique | Ce qu'on y trouve |
+| --- | --- |
+| **Architecture** | L'état actuel du système et la raison de chaque choix : [modèle de données](./architecture/modele-de-donnees.md), [architecture du backend](./architecture/backend.md) |
+| **Guides** | Les procédures reproductibles : environnement local, [cycle du ticket au merge](./guides/workflow.md) |
+| **Référence** | Les [règles métier](./reference/regles-metier.md) et le [lexique](./reference/lexique.md) |
+| **ADR (archive)** | Les décisions structurantes consignées jusqu'au 05/11/2026. Le registre est clos : les nouvelles décisions sont décrites dans l'architecture |
 
-Pour ajouter une décision, dupliquez le modèle `docs/adr/_template.md` (son
-préfixe underscore le garde hors du site publié), numérotez-le à la suite
-(`adr-XXX-titre-court.md`) et rédigez les trois sections. Un ADR accepté ne se modifie plus : s'il est remis en cause,
-on écrit un nouvel ADR qui le remplace.
+Les commandes du quotidien (tests, lancement de l'API, base de données, site de
+documentation) sont regroupées dans le `README.md` à la racine du dépôt.

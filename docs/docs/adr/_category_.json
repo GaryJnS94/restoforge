@@ -1,5 +1,9 @@
 {
-  "label": "ADR",
+  "label": "ADR (archive)",
   "position": 2,
-  "link": null
+  "link": {
+    "type": "generated-index",
+    "title": "ADR (archive)",
+    "description": "Registre clos le 05/11/2026. Ces décisions restent en vigueur tant qu'une page d'architecture ne les remplace pas. Les nouvelles décisions sont décrites, avec leur raison d'être, dans la documentation d'architecture."
+  }
 }
