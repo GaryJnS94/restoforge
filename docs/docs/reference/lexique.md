@@ -173,7 +173,8 @@ Format de description d'une API REST, produit par springdoc à partir du code du
 backend. Il sert de contrat unique entre l'API et les fronts, dont les types
 TypeScript sont générés.
 
-Voir : [Contrat OpenAPI](../architecture/backend.md#contrat-openapi)
+Voir : [Contrat OpenAPI](../architecture/backend.md#contrat-openapi),
+[ADR-001 — Monorepo](../adr/adr-001-monorepo.md)
 
 ### ORM (Object-Relational Mapping)
 

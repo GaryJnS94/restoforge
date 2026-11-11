@@ -236,14 +236,36 @@ L'API démarrée, deux adresses :
 Le JSON est la source lue par un générateur de types. Swagger UI ne fait que
 l'afficher.
 
-### R2 — la spec publiée est celle du code qui tourne
+On ne versionne pas de fichier OpenAPI à côté du code : springdoc construit la
+spec à partir des controllers présents au démarrage. Une route ajoutée ou
+retirée se reflète à la lecture suivante de `/v3/api-docs`.
 
-On ne versionne pas de fichier OpenAPI à côté du code. Le contrat consulté est
-celui des controllers présents dans le contexte, au moment où l'application
-démarre. Une route ajoutée ou retirée apparaît à la lecture suivante de
-`/v3/api-docs`, sans spec à maintenir à la main.
+Les quatre règles suivantes reprennent la numérotation du ticket OpenAPI
+(RES-11). Elles n'ont **aucun lien** avec les numéros des
+[règles métier](../reference/regles-metier.md).
 
-### R3 — un test de garde sur le contexte complet
+### R2 — Aucune annotation OpenAPI sur les controllers
+
+Pendant le MVP, les controllers ne portent ni `@Operation`, ni `@Schema`, ni
+autre annotation de la famille swagger. springdoc infère la spec depuis les
+mappings Spring (`@GetMapping`, `@RequestMapping`), les types de retour et les
+DTO. C'est volontaire : la spec reste la vérité du code sans couche de
+commentaires à maintenir en parallèle. Quand l'authentification arrivera, on
+pourra enrichir la doc au besoin ; en attendant, leur absence est une décision
+documentée, pas un oubli.
+
+### R3 — Spec et Swagger UI actifs dans tous les profils (MVP)
+
+Aucune propriété `springdoc.api-docs.enabled` ni `springdoc.swagger-ui.enabled`
+ne désactive l'exposition par profil : `/v3/api-docs` et `/swagger-ui.html`
+restent joignables que l'API tourne avec le profil par défaut, `dev`, dans le
+conteneur compose ou lors des tests qui chargent le contexte complet. C'est
+assumé pour le MVP (développement et intégration des fronts sans friction).
+L'arrivée de l'authentification imposera très probablement de restreindre
+Swagger en production ; la règle actuelle fixe explicitement ce qui est en place
+aujourd'hui.
+
+### R4 — Test de garde sur le contexte complet
 
 `@WebMvcTest` ne charge qu'une tranche de l'application : il ne voit pas la
 configuration springdoc qui tourne vraiment. `OpenApiDocsTest`, dans le package
