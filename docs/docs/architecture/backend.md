@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Architecture du backend
-description: Organisation du code de l'API, conventions de chaque couche, frontière entre service et couche web, et modèles de test.
+description: Organisation du code de l'API, conventions de chaque couche, frontière entre service et couche web, contrat OpenAPI et modèles de test.
 ---
 
 # Architecture du backend
@@ -216,3 +216,72 @@ starter : `@WebMvcTest` est fourni par `spring-boot-starter-webmvc-test`
 (package `org.springframework.boot.webmvc.test.autoconfigure`), comme
 `@DataJpaTest` par `spring-boot-starter-data-jpa-test`. `@MockitoBean`
 remplace `@MockBean`, retiré.
+
+## Contrat OpenAPI
+
+La spec n'est pas un fichier du dépôt. `springdoc-openapi-starter-webmvc-ui`
+(version explicite dans `api/pom.xml` : le parent Spring Boot ne la gère pas)
+la construit au démarrage à partir des controllers, et l'API la sert
+elle-même. Aucune classe de configuration n'est ajoutée.
+
+### Où lire la spec
+
+L'API démarrée, deux adresses :
+
+| Lecture | Adresse |
+| --- | --- |
+| Spec JSON, le contrat | `http://localhost:8080/v3/api-docs` |
+| Swagger UI, la même spec en page interactive | `http://localhost:8080/swagger-ui.html` |
+
+Le JSON est la source lue par un générateur de types. Swagger UI ne fait que
+l'afficher.
+
+On ne versionne pas de fichier OpenAPI à côté du code : springdoc construit la
+spec à partir des controllers présents au démarrage. Une route ajoutée ou
+retirée se reflète à la lecture suivante de `/v3/api-docs`.
+
+Les règles suivantes reprennent la numérotation du ticket OpenAPI (RES-11). Elles
+n'ont **aucun lien** avec les numéros des
+[règles métier](../reference/regles-metier.md).
+
+### R1 — springdoc 3.x aligné sur Spring Boot 4.1
+
+Dépendance `springdoc-openapi-starter-webmvc-ui`, version explicite dans
+`api/pom.xml` (3.2.0) : le parent Spring Boot ne la gère pas. Chaque série de
+springdoc suit une génération de Spring Boot (v2 pour Boot 3, v3 pour Boot 4).
+Une version mal assortie fait échouer le démarrage ou renvoie une Swagger UI
+en 404. À chaque montée de Spring Boot, vérifier la version de springdoc.
+
+### R2 — Aucune annotation OpenAPI sur les controllers
+
+Pendant le MVP, les controllers ne portent ni `@Operation`, ni `@Schema`, ni
+autre annotation de la famille swagger. springdoc infère la spec depuis les
+mappings Spring (`@GetMapping`, `@RequestMapping`), les types de retour et les
+DTO. C'est volontaire : la spec reste la vérité du code sans couche de
+commentaires à maintenir en parallèle. Quand l'authentification arrivera, on
+pourra enrichir la doc au besoin ; en attendant, leur absence est une décision
+documentée, pas un oubli.
+
+### R3 — Spec et Swagger UI actifs dans tous les profils (MVP)
+
+Aucune propriété `springdoc.api-docs.enabled` ni `springdoc.swagger-ui.enabled`
+ne désactive l'exposition par profil : `/v3/api-docs` et `/swagger-ui.html`
+restent joignables que l'API tourne avec le profil par défaut, `dev`, dans le
+conteneur compose ou lors des tests qui chargent le contexte complet. C'est
+assumé pour le MVP (développement et intégration des fronts sans friction).
+L'arrivée de l'authentification imposera très probablement de restreindre
+Swagger en production ; la règle actuelle fixe explicitement ce qui est en place
+aujourd'hui.
+
+### R4 — Test de garde sur le contexte complet
+
+`@WebMvcTest` ne charge qu'une tranche de l'application : il ne voit pas la
+configuration springdoc qui tourne vraiment. `OpenApiDocsTest`, dans le package
+racine `com.restoforge.api` (la spec couvre tous les domaines, pas un seul),
+démarre le contexte comme `ApiApplicationTests` : `@SpringBootTest` et l'import
+de `TestcontainersConfiguration`, plus `@AutoConfigureMockMvc` pour obtenir un
+`MockMvc`.
+
+Le test appelle `GET /v3/api-docs`, attend 200, et vérifie que le JSON contient
+le chemin `/products/{id}`. Sans la dépendance springdoc, cette adresse répond
+404 : le test passe au rouge. Un test qui resterait vert ne protégerait rien.

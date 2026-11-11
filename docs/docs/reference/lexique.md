@@ -173,7 +173,8 @@ Format de description d'une API REST, produit par springdoc à partir du code du
 backend. Il sert de contrat unique entre l'API et les fronts, dont les types
 TypeScript sont générés.
 
-Voir : [ADR-001 — Monorepo](../adr/adr-001-monorepo.md)
+Voir : [Contrat OpenAPI](../architecture/backend.md#contrat-openapi),
+[ADR-001 — Monorepo](../adr/adr-001-monorepo.md)
 
 ### ORM (Object-Relational Mapping)
 
@@ -219,6 +220,14 @@ de quantité suggérée et de mise à jour du stock.
 Arbre DOM encapsulé attaché à un élément, dont les styles et la structure
 n'interagissent pas avec le reste de la page. C'est le mécanisme d'isolation des
 composants forge-ui.
+
+### Swagger UI
+
+Page web interactive qui affiche la spec OpenAPI de l'API et permet d'essayer
+les requêtes. springdoc la sert à l'adresse `/swagger-ui.html` quand l'API
+tourne. Le contrat lui-même reste le JSON OpenAPI.
+
+Voir : [Contrat OpenAPI](../architecture/backend.md#contrat-openapi)
 
 ### Testcontainers
 
