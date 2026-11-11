@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Architecture du backend
-description: Organisation du code de l'API, conventions de chaque couche, frontière entre service et couche web, et modèles de test.
+description: Organisation du code de l'API, conventions de chaque couche, frontière entre service et couche web, contrat OpenAPI et modèles de test.
 ---
 
 # Architecture du backend
@@ -216,3 +216,42 @@ starter : `@WebMvcTest` est fourni par `spring-boot-starter-webmvc-test`
 (package `org.springframework.boot.webmvc.test.autoconfigure`), comme
 `@DataJpaTest` par `spring-boot-starter-data-jpa-test`. `@MockitoBean`
 remplace `@MockBean`, retiré.
+
+## Contrat OpenAPI
+
+La spec n'est pas un fichier du dépôt. `springdoc-openapi-starter-webmvc-ui`
+(version explicite dans `api/pom.xml` : le parent Spring Boot ne la gère pas)
+la construit au démarrage à partir des controllers, et l'API la sert
+elle-même. Aucune classe de configuration n'est ajoutée.
+
+### Où lire la spec
+
+L'API démarrée, deux adresses :
+
+| Lecture | Adresse |
+| --- | --- |
+| Spec JSON, le contrat | `http://localhost:8080/v3/api-docs` |
+| Swagger UI, la même spec en page interactive | `http://localhost:8080/swagger-ui.html` |
+
+Le JSON est la source lue par un générateur de types. Swagger UI ne fait que
+l'afficher.
+
+### R2 — la spec publiée est celle du code qui tourne
+
+On ne versionne pas de fichier OpenAPI à côté du code. Le contrat consulté est
+celui des controllers présents dans le contexte, au moment où l'application
+démarre. Une route ajoutée ou retirée apparaît à la lecture suivante de
+`/v3/api-docs`, sans spec à maintenir à la main.
+
+### R3 — un test de garde sur le contexte complet
+
+`@WebMvcTest` ne charge qu'une tranche de l'application : il ne voit pas la
+configuration springdoc qui tourne vraiment. `OpenApiDocsTest`, dans le package
+racine `com.restoforge.api` (la spec couvre tous les domaines, pas un seul),
+démarre le contexte comme `ApiApplicationTests` : `@SpringBootTest` et l'import
+de `TestcontainersConfiguration`, plus `@AutoConfigureMockMvc` pour obtenir un
+`MockMvc`.
+
+Le test appelle `GET /v3/api-docs`, attend 200, et vérifie que le JSON contient
+le chemin `/products/{id}`. Sans la dépendance springdoc, cette adresse répond
+404 : le test passe au rouge. Un test qui resterait vert ne protégerait rien.

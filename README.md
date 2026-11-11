@@ -80,6 +80,13 @@ curl -i localhost:8080/products/999 # 404 au format ProblemDetail
 > Maven ne lit pas `.env`. Le sous-shell `( … )` charge ses variables pour
 > cette seule commande, sans les laisser dans le terminal.
 
+### …consulter la documentation de l'API
+
+L'API doit être démarrée (Maven ou conteneur), sur le port 8080.
+
+- Spec OpenAPI, JSON : http://localhost:8080/v3/api-docs
+- Swagger UI : http://localhost:8080/swagger-ui.html
+
 ### …lancer toute la pile en conteneurs
 
 Pour vérifier que l'image Docker de l'API fonctionne, telle qu'elle sera
