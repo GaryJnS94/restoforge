@@ -1,5 +1,6 @@
-package com.restoforge.api.stock;
+package com.restoforge.api.stock.product;
 
+import com.restoforge.api.stock.supplier.Supplier;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -113,13 +114,19 @@ public class Product {
     this.alertThreshold = alertThreshold;
   }
 
-  /**
-   * Pas de setter : le stock ne se pilote pas librement. Sa seule évolution
-   * prévue au MVP est l'incrément à la réception d'une commande (RES-13), qui
-   * portera une méthode métier dédiée.
-   */
   public BigDecimal getStock() {
     return stock;
+  }
+
+  /**
+   * Saisie ou correction manuelle dans le catalogue. L'incrément à la réception
+   * d'une commande passera par une autre méthode métier (règle 8).
+   */
+  public void replaceStock(BigDecimal newStock) {
+    if (newStock.compareTo(BigDecimal.ZERO) < 0) {
+      throw new IllegalArgumentException("stock must be >= 0");
+    }
+    this.stock = newStock;
   }
 
   /**

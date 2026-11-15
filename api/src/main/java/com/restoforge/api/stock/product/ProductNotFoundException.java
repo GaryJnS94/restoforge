@@ -1,4 +1,4 @@
-package com.restoforge.api.stock;
+package com.restoforge.api.stock.product;
 
 /**
  * Exception métier : aucun produit pour cet id. Elle ne porte aucun code HTTP,

@@ -1,8 +1,7 @@
 package com.restoforge.api.stock.dto;
 
+import com.restoforge.api.stock.product.Product;
 import java.math.BigDecimal;
-
-import com.restoforge.api.stock.Product;
 
 /**
  * Représentation JSON d'un produit renvoyée par l'API.

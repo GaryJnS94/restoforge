@@ -64,6 +64,17 @@ Réponse attendue : le statut `UP`, accompagné du détail du composant
 ./mvnw test
 ```
 
+## Exporter la spec OpenAPI
+
+L'API doit tourner sur le port 8080 :
+
+```bash
+./scripts/export-openapi.sh
+```
+
+Le JSON est écrit dans `generated/openapi.json` (ignoré par git). Sers-en
+pour régénérer les types TypeScript des applications front.
+
 ## Configuration
 
 Variables d'environnement lues au démarrage, avec leur valeur par défaut

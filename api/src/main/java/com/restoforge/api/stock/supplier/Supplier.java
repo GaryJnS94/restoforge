@@ -1,4 +1,4 @@
-package com.restoforge.api.stock;
+package com.restoforge.api.stock.supplier;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

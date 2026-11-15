@@ -1,8 +1,9 @@
-package com.restoforge.api.stock;
+package com.restoforge.api.stock.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.restoforge.api.TestcontainersConfiguration;
+import com.restoforge.api.stock.supplier.Supplier;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +37,6 @@ class ProductRepositoryTest {
   @Autowired
   private ProductRepository productRepository;
 
-  /**
-   * Accès direct à JPA, réservé aux tests : il permet d'insérer un fournisseur
-   * sans créer de SupplierRepository pour l'occasion.
-   */
   @Autowired
   private TestEntityManager entityManager;
 
@@ -88,6 +85,33 @@ class ProductRepositoryTest {
   @DisplayName("findById renvoie un Optional vide pour un id inconnu")
   void findByIdRenvoieVidePourUnIdInconnu() {
     assertThat(productRepository.findById(999_999L)).isEmpty();
+  }
+
+  @Test
+  @DisplayName("règle 14 — findAllBelowThreshold exclut stock égal au seuil")
+  void findAllBelowThreshold_strictementInferieur() {
+    Product sousSeuil = produit("Farine T55", "0.95", "20");
+    sousSeuil.replaceStock(new BigDecimal("19.999"));
+    productRepository.save(sousSeuil);
+
+    Product auSeuil = produit("Beurre", "8.40", "6");
+    auSeuil.replaceStock(new BigDecimal("6"));
+    productRepository.save(auSeuil);
+    viderLeCache();
+
+    assertThat(productRepository.findAllBelowThreshold())
+        .extracting(Product::getName)
+        .containsExactly("Farine T55");
+  }
+
+  @Test
+  @DisplayName("existsBySupplierId détecte les produits d'un fournisseur")
+  void existsBySupplierId() {
+    productRepository.save(produit("Farine T55", "0.95", "20"));
+    viderLeCache();
+
+    assertThat(productRepository.existsBySupplierId(metro.getId())).isTrue();
+    assertThat(productRepository.existsBySupplierId(999_999L)).isFalse();
   }
 
   /**
